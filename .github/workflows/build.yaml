@@ -18,7 +18,7 @@ jobs:
         run: |
           mkdir -p rnld_api && cp config.lua fxmanifest.lua server.lua rnld_api/
           zip -r rnld_api.zip rnld_api
-          sha1sum server.lua > server.lua.sha1
+          sha1sum server.lua | awk '{print $1}' > server.lua.sha1
 
           gh release create "release-${{ github.run_number }}" \
             rnld_api.zip server.lua server.lua.sha1 \

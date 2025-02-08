@@ -24,3 +24,5 @@ jobs:
             rnld_api.zip server.lua server.lua.sha1 \
             --title "Framework Builds Release #${{ github.run_number }}" \
             --notes "This release includes builds for qbcore and vrpex frameworks."
+        env:
+          GH_TOKEN: ${{ github.token }}

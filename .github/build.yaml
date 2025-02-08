@@ -1,0 +1,24 @@
+name: Release creator
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Create a release in target repository
+        working-directory: lua
+        id: create_release
+        run: |
+          mkdir -p rnld_api && mv config.lua fxmanifest.lua server.lua rnld_api/
+          zip -r rnld_api.zip rnld_api
+          sha1sum server.lua > server.lua.sha1
+
+          gh release create "release-${{ github.run_number }}" \
+            rnld_api.zip server.lua server.lua.sha1 \
+            --title "Framework Builds Release #${{ github.run_number }}" \
+            --notes "This release includes builds for qbcore and vrpex frameworks."

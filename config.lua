@@ -12,15 +12,29 @@ vRP = Proxy.getInterface("vRP")
 -- local QBCore = exports['qb-core']:GetCoreObject()
 
 Config = {
-  guildId = "",          -- id do seu servidor discord
-  discordIdMock = false, -- Se true, irá usar um ID de Discord fictício
-  fakeDiscordId = "",    -- ID de Discord fictício
-  appKey = "",           -- Chave da API
-  framework = "vrp",     -- Framework utilizado ( vrp, creative, creative-network, qbcore, vorpcore)
+  guildId = "", -- id do seu servidor discord
+  appKey = "",  -- Chave da API
+  debug = false,
+
+  -- Esse resource tem a funcionalidade de acionar a API para renomear o player
+  -- Você poderá habilitá-la, ou desabilitar basicamente escolhendo o framework "custom"
+  -- Se colocar "custom" voce também deverá descomentar a linha 46 e colocar qualquer nome para o evento
+  framework = "vrp", -- Framework utilizado ( vrp, creative, creative-network, qbcore, vorpcore)
 
   -- Ativa as funcionalidades da Whitelist Remota
   BaseMode = "discord", --Configura qual licença será exigida pelo script, discord, steam ou license
-  Whitelist = true      -- Ativa o modo de whitelist utilizando nossa API, será necessario desabilitar a whitelist da sua base.
+  Whitelist = true,     -- Ativa o modo de whitelist utilizando nossa API, será necessario desabilitar a whitelist da sua base.
+
+  -- Configura como a mensagem de whitelist será apresentada ao player
+  ConnectUI = {
+    -- "card" para usar deferrals.presentCard (Adaptive Card)
+    -- "text" para usar deferrals.done com mensagem em texto
+    mode = "card",
+
+    -- Somente quando mode = "card"
+    attempts = 2,       -- Loop para apresentar o deferralscard
+    intervalMs = 10000, -- intervalo entre presents (ms)
+  }
 }
 
 rnld = {

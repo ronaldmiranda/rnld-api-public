@@ -30,7 +30,7 @@ Config = {
     -- "card" para usar deferrals.presentCard (Adaptive Card)
     -- "text" para usar deferrals.done com mensagem em texto
     mode = "card",
-
+    -- eventName = "", -- Faz o script acionar um evento retornando o token do player
     -- Somente quando mode = "card"
     attempts = 2,       -- Loop para apresentar o deferralscard
     intervalMs = 10000, -- intervalo entre presents (ms)

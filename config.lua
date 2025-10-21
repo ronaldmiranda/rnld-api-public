@@ -11,6 +11,19 @@ vRP = Proxy.getInterface("vRP")
 -- caso use qbcore, descomente as linhas abaixo
 -- local QBCore = exports['qb-core']:GetCoreObject()
 
+Msgs = {
+  divergenceMsg = [[
+  VOCÊ ESTÁ COM FALHA NA IDENTIFICAÇÃO DA CONTA,
+  POR FAVOR, PRINTE ESTA TELA E ABRA UM TICKET EM NOSSO DISCORD.
+  ]],
+
+  bannedMsg = [[
+  VOCÊ ESTÁ BANIDO DO SERVIDOR,
+  SE ACHAR QUE FOI UM ENGANO, ABRA UM TICKET EM NOSSO DISCORD E COMPARTILHE SEU TOKEN.
+  MOTIVO: %s
+  ]]
+}
+
 Config = {
   guildId = "", -- id do seu servidor discord
   appKey = "",  -- Chave da API

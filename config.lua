@@ -28,6 +28,7 @@ Config = {
   guildId = "", -- id do seu servidor discord
   appKey = "",  -- Chave da API
   debug = false,
+  -- MockedDiscordId = "", -- Defina um discord id menos privilegiado para que o sistema possa aplicar a mudança do apelido
 
   -- Esse resource tem a funcionalidade de acionar a API para renomear o player
   -- Você poderá habilitá-la, ou desabilitar basicamente escolhendo o framework "custom"

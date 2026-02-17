@@ -28,7 +28,8 @@ Config = {
   guildId = "", -- id do seu servidor discord
   appKey = "",  -- Chave da API
   debug = false,
-  -- MockedDiscordId = "", -- Defina um discord id menos privilegiado para que o sistema possa aplicar a mudança do apelido
+  -- MockedDiscordId = "", -- junto com debug true, força o script a renomear um discord especifico, para facilitar os testes
+  vpnMode = "full", -- full, alert (Significa que o player será barrado ao utilizar vpn, ou apenas alertado no canal)
 
   -- Esse resource tem a funcionalidade de acionar a API para renomear o player
   -- Você poderá habilitá-la, ou desabilitar basicamente escolhendo o framework "custom"
@@ -38,6 +39,7 @@ Config = {
   -- Ativa as funcionalidades da Whitelist Remota
   BaseMode = "discord", --Configura qual licença será exigida pelo script, discord, steam ou license
   Whitelist = true,     -- Ativa o modo de whitelist utilizando nossa API, será necessario desabilitar a whitelist da sua base.
+  ConsiderRockstar = true, -- Tira a validação da license e license2 da equação
 
   -- Configura como a mensagem de whitelist será apresentada ao player
   ConnectUI = {

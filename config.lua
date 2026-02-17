@@ -63,14 +63,14 @@ rnld = {
   getFirstLastName = function(source)
     local user_id = vRP.getUserId(source)
     local identity = vRP.getUserIdentity(user_id)
-    local fullName = identity.nome .. " " .. identity.sobrenome .. " | " .. user_id
+    local fullName = string.format("%s %s | %s", identity.nome, identity.sobrenome, user_id)
     return fullName
   end,
 
   -- em bases CREATIVE
   -- getFirstLastName = function(source)
   --   local user_id = vRP.Passport(source)
-  --   local fullName = vRP.FullName(user_id) .. " | " .. user_id
+  --   local fullName = string.format("%s | %s", vRP.FullName(user_id), user_id)
   --   return fullName
   -- end,
 
@@ -78,7 +78,7 @@ rnld = {
   -- em bases QBCORE
   -- getFirstLastName = function(source)
   --   local user = QBCore.Functions.GetPlayer(source)
-  --   local fullName = user.PlayerData.charinfo.firstname .. " " .. user.PlayerData.charinfo.lastname .. " | " .. user.PlayerData.citizenid
+  --   local fullName = string.format("%s %s | %s", user.PlayerData.charinfo.firstname, user.PlayerData.charinfo.lastname, user.PlayerData.citizenid)
   --   return fullName
   -- end,
 
@@ -86,7 +86,7 @@ rnld = {
   -- getFirstLastName = function(source)
   --   local user = VorpCore.getUser(source)
   --   local Character = user.getUsedCharacter
-  --   local fullName = Character.firstname .. " " .. Character.lastname .. " | " .. user.source
+  --   local fullName = string.format("%s %s | %s", Character.firstname, Character.lastname, user.source)
   --   return fullName
   -- end,
 }

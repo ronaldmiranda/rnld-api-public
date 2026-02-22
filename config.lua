@@ -61,6 +61,16 @@ rnld = {
 
   -- customEventName = "CharacterChosen", -- evento chamado quando o jogador seleciona seu personagem
 
+  -- função do framework para resolver playerID por source
+  -- Esse parametro vai permitir o uso dos exports: rnld_api:getPlayerIdByToken e rnld_api:getTokenByPlayerId
+  -- Comente este bloco inteiro caso não queira utilizar.
+  registerPlayerIdResolver = function(source)
+    return vRP.getUserId(source)
+    -- return vRP.Passport(source)
+    -- return QBCore.Functions.GetPlayer(source).PlayerData.citizenid
+    -- return VorpCore.getUser(source).getUsedCharacter.source
+  end,
+
   -- essa função necessita retornar o nome completo do personagem e o ID.
   getFirstLastName = function(source)
     local user_id = vRP.getUserId(source)

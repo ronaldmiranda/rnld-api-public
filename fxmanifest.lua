@@ -14,7 +14,7 @@ shared_scripts {
 }
 
 server_scripts {
-  '@vrp/lib/utils.lua', -- caso não utilize vRP, remova essa linha
+  -- '@vrp/lib/utils.lua', -- caso não utilize vRP, remova essa linha
   'config.lua',
   'server.lua'
 }

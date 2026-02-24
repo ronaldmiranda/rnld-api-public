@@ -51,6 +51,16 @@ Config = {
     attempts = 2,       -- Loop para apresentar o deferralscard
     intervalMs = 10000, -- intervalo entre presents (ms)
   }
+
+  -- Sistema de conversão de whitelist, usa a funcão do seu framework para converter para TOKEN
+  -- E assim o sistema concederá o TOKEN com a whitelist liberada.
+  ExistingWhitelist = {
+    enabled = false,
+    -- Retorne true quando o player ja possui whitelist na sua base
+    -- checker = function(source, licenses)
+    --   return false
+    -- end
+  }
 }
 
 rnld = {

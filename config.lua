@@ -37,8 +37,8 @@ Config = {
   framework = "vrp", -- Framework utilizado ( vrp, creative, creative-network, qbcore, vorpcore)
 
   -- Ativa as funcionalidades da Whitelist Remota
-  BaseMode = "discord", --Configura qual licença será exigida pelo script, discord, steam ou license
-  Whitelist = true,     -- Ativa o modo de whitelist utilizando nossa API, será necessario desabilitar a whitelist da sua base.
+  BaseMode = "discord",    --Configura qual licença será exigida pelo script, discord, steam ou license
+  Whitelist = true,        -- Ativa o modo de whitelist utilizando nossa API, será necessario desabilitar a whitelist da sua base.
   ConsiderRockstar = true, -- Tira a validação da license e license2 da equação
 
   -- Configura como a mensagem de whitelist será apresentada ao player
@@ -50,7 +50,7 @@ Config = {
     -- Somente quando mode = "card"
     attempts = 2,       -- Loop para apresentar o deferralscard
     intervalMs = 10000, -- intervalo entre presents (ms)
-  }
+  },
 
   -- Sistema de conversão de whitelist, usa a funcão do seu framework para converter para TOKEN
   -- E assim o sistema concederá o TOKEN com a whitelist liberada.
@@ -58,6 +58,7 @@ Config = {
     enabled = false,
     -- Retorne true quando o player ja possui whitelist na sua base
     -- checker = function(source, licenses)
+    -- { licenses = { steam = "123", discord = "123", license = "123" } }
     --   return false
     -- end
   }

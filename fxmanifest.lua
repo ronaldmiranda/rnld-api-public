@@ -14,7 +14,8 @@ shared_scripts {
 }
 
 server_scripts {
-  -- '@vrp/lib/utils.lua', -- caso não utilize vRP, remova essa linha
+  '@vrp/lib/utils.lua', -- caso não utilize vRP, remova essa linha
+  -- '@vrp/lib/Utils.lua', -- Algumas Creatives usam Utils ao invés de utils
   'config.lua',
   'server.lua'
 }

@@ -48,18 +48,25 @@ Config = {
     mode = "card",
     -- eventName = "", -- Faz o script acionar um evento retornando o token do player
     -- Somente quando mode = "card"
-    attempts = 2,       -- Loop para apresentar o deferralscard
-    intervalMs = 10000, -- intervalo entre presents (ms)
+    attempts = 2,      -- Loop para apresentar o deferralscard
+    intervalMs = 2000, -- intervalo entre presents (ms)
   },
 
-  -- Sistema de conversão de whitelist, usa a funcão do seu framework para converter para TOKEN
-  -- E assim o sistema concederá o TOKEN com a whitelist liberada.
+  -- Sincroniza players que já têm whitelist na sua base com o sistema RNLD.
+  -- Quando enabled = true, checker é obrigatório (função do framework que retorna true se o player já tem whitelist).
+  -- Se o checker retornar true, o script chamará o conversor de whitelist; O card de liberação será ignorado e o player será liberado automaticamente.
   ExistingWhitelist = {
     enabled = false,
-    -- Retorne true quando o player ja possui whitelist na sua base
+    -- Obrigatório quando enabled = true. Função do framework: retorna true se o player já possui whitelist na sua base.
+    -- Parâmetros: source (number), licenses (tabela com steam, discord, license, etc.)
+    -- { licenses = { steam = "1234567890", discord = "1234567890", license = "1234567890", license2 = "1234567890", fivem = "1234567890", live = "1234567890" } }
     -- checker = function(source, licenses)
-    -- { licenses = { steam = "123", discord = "123", license = "123" } }
-    --   return false
+    --   whitelisted = <sua função para verificar se o player tem whitelist no seu banco de dados>
+    --   return whitelisted
+    -- end,
+    -- Opcional: resolver discordId para enviar na conversão (padrão: licenses.discord)
+    -- discordIdResolver = function(source, licenses)
+    --   return licenses and licenses.discord or ""
     -- end
   }
 }
@@ -74,7 +81,6 @@ rnld = {
 
   -- função do framework para resolver playerID por source
   -- Esse parametro vai permitir o uso dos exports: rnld_api:getPlayerIdByToken e rnld_api:getTokenByPlayerId
-  -- Comente este bloco inteiro caso não queira utilizar.
   registerPlayerIdResolver = function(source)
     return vRP.getUserId(source)
     -- return vRP.Passport(source)

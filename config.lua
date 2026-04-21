@@ -37,9 +37,11 @@ Config = {
   framework = "vrp", -- Framework utilizado ( vrp, creative, creative-network, qbcore, vorpcore)
 
   -- Ativa as funcionalidades da Whitelist Remota
-  BaseMode = "discord",    --Configura qual licença será exigida pelo script, discord, steam ou license
-  Whitelist = true,        -- Ativa o modo de whitelist utilizando nossa API, será necessario desabilitar a whitelist da sua base.
-  ConsiderRockstar = true, -- Tira a validação da license e license2 da equação
+  BaseMode = "discord,steam",   --Configura qual licença será exigida pelo script, discord, steam ou license
+  Whitelist = true,             -- Ativa o modo de whitelist utilizando nossa API, será necessario desabilitar a whitelist da sua base.
+  validarPresencaGuild = false, -- Quando true, impede a entrada de jogadores que não estejam presentes na guild do Discord.
+  discordInviteUrl = "",        -- Link de convite do Discord exibido no card quando o player não está na guild (ex: "https://discord.gg/seuservidor")
+  ConsiderRockstar = true,      -- Tira a validação da license e license2 da equação
 
   -- Configura como a mensagem de whitelist será apresentada ao player
   ConnectUI = {

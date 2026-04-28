@@ -29,7 +29,8 @@ Config = {
   appKey = "",  -- Chave da API
   debug = false,
   -- MockedDiscordId = "", -- junto com debug true, força o script a renomear um discord especifico, para facilitar os testes
-  vpnMode = "full", -- full, alert (Significa que o player será barrado ao utilizar vpn, ou apenas alertado no canal)
+  monitoring = true, -- Habilita/desabilita o envio de eventos de monitoramento (session_start, session_end, server_start, server_shutdown)
+  vpnMode = "full",  -- full, alert (Significa que o player será barrado ao utilizar vpn, ou apenas alertado no canal)
 
   -- Esse resource tem a funcionalidade de acionar a API para renomear o player
   -- Você poderá habilitá-la, ou desabilitar basicamente escolhendo o framework "custom"

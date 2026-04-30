@@ -46,9 +46,10 @@ Config = {
 
   -- Configura como a mensagem de whitelist será apresentada ao player
   ConnectUI = {
+    -- "styled" para usar deferrals.presentCard (Estilizado)
     -- "card" para usar deferrals.presentCard (Adaptive Card)
     -- "text" para usar deferrals.done com mensagem em texto
-    mode = "card",
+    mode = "styled",
     -- eventName = "", -- Faz o script acionar um evento retornando o token do player
     -- Somente quando mode = "card"
     attempts = 2,      -- Loop para apresentar o deferralscard

@@ -26,11 +26,12 @@ Msgs = {
 
 Config = {
   guildId = "", -- id do seu servidor discord
-  appKey = "",  -- Chave da API
+  appKey = "",  -- Chave da API (ou use a convar rnld_api_key)
   debug = false,
   -- MockedDiscordId = "", -- junto com debug true, força o script a renomear um discord especifico, para facilitar os testes
   monitoring = true, -- Habilita/desabilita o envio de eventos de monitoramento (session_start, session_end, server_start, server_shutdown)
   vpnMode = "full",  -- full, alert (Significa que o player será barrado ao utilizar vpn, ou apenas alertado no canal)
+  locale = "pt-br",  -- idioma das mensagens ao jogador: "pt-br" | "en-us" | "pt-pt"
 
   -- Esse resource tem a funcionalidade de acionar a API para renomear o player
   -- Você poderá habilitá-la, ou desabilitar basicamente escolhendo o framework "custom"
@@ -73,6 +74,35 @@ Config = {
     -- discordIdResolver = function(source, licenses)
     --   return licenses and licenses.discord or ""
     -- end
+  },
+
+  -- Sincroniza a whitelist da RNLD com o seu banco de dados local.
+  -- Quando enabled = true e o player conecta com o token JÁ liberado, o script executa um
+  -- UPDATE marcando a coluna especificada como `value` (padrão: true) na sua tabela.
+  -- Como cada base usa uma lib de MySQL diferente (oxmysql, mysql-async, ghmattimysql...),
+  -- VOCÊ fornece a função `query`; o script apenas monta o SQL parametrizado e a chama.
+  -- Falhas na sincronização nunca barram a entrada do player (apenas logam o erro).
+  LocalWhitelistSync = {
+    enabled = false,
+    table = "users",              -- tabela do seu banco
+    column = "whitelisted",       -- coluna marcada quando o player é liberado
+    value = true,                 -- valor aplicado na coluna (padrão: true)
+    identifierColumn = "license", -- coluna do WHERE usada para localizar o player
+
+    -- Opcional. Resolve o valor do identificador (WHERE identifierColumn = ?) a partir das licenses.
+    -- Se omitido, o script usa licenses[identifierColumn] (ex: licenses.license).
+    -- Parâmetros: source (number), licenses (steam, discord, license, license2, fivem, live), wlId (string)
+    -- identifierResolver = function(source, licenses, wlId)
+    --   return licenses.license
+    -- end,
+
+    -- Obrigatório quando enabled = true. Recebe (sql, params) e executa na lib do seu servidor.
+    -- O `sql` já vem com placeholders (?) e `params` é a lista de valores na ordem.
+    query = function(sql, params)
+      -- oxmysql:      exports.oxmysql:execute(sql, params)
+      -- mysql-async:  MySQL.Async.execute(sql, params)
+      -- ghmattimysql: exports.ghmattimysql:execute(sql, params)
+    end,
   }
 }
 

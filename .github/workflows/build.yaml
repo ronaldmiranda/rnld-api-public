@@ -16,13 +16,29 @@ jobs:
       - name: Create a release in target repository
         id: create_release
         run: |
-          mkdir -p rnld_api && cp config.lua fxmanifest.lua server.lua rnld_api/
+          # Monta o resource completo pro zip (instalação fresca): inclui client.js + nui/.
+          mkdir -p rnld_api/nui
+          cp config.lua fxmanifest.lua server.lua client.js rnld_api/
+          cp nui/index.html nui/app.js rnld_api/nui/
           zip -r rnld_api.zip rnld_api
-          sha1sum server.lua | awk '{print $1}' > server.lua.sha1
+
+          # Assets individuais do auto-update multi-arquivo. Assets de release são
+          # "flat" (sem "/"), então nui/ vira prefixo no nome: nui_app.js / nui_index.html.
+          # Cada um com seu .sha1 (hash puro) — os nomes batem com update_artifacts no server.lua.
+          sha1of() { sha1sum "$1" | awk '{print $1}'; }
+          sha1of server.lua > server.lua.sha1
+          sha1of client.js  > client.js.sha1
+          cp nui/app.js     nui_app.js     && sha1of nui_app.js     > nui_app.js.sha1
+          cp nui/index.html nui_index.html && sha1of nui_index.html > nui_index.html.sha1
 
           gh release create "release-${{ github.run_number }}" \
-            rnld_api.zip server.lua server.lua.sha1 \
+            rnld_api.zip \
+            server.lua server.lua.sha1 \
+            client.js client.js.sha1 \
+            nui_app.js nui_app.js.sha1 \
+            nui_index.html nui_index.html.sha1 \
             --title "Framework Builds Release #${{ github.run_number }}" \
-            --notes "This release includes builds for qbcore and vrpex frameworks."
+            --notes "This release includes builds for qbcore and vrpex frameworks." \
+            --latest
         env:
           GH_TOKEN: ${{ github.token }}

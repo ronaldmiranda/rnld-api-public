@@ -103,6 +103,12 @@ Config = {
       -- mysql-async:  MySQL.Async.execute(sql, params)
       -- ghmattimysql: exports.ghmattimysql:execute(sql, params)
     end,
+  },
+
+  -- ativa a deteccao de hardwares via client-side
+  AntiSpoofer = {
+    enabled = true,
+    hbIntervalMs = 10000,
   }
 }
 

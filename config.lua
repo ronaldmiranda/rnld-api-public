@@ -56,6 +56,11 @@ Config = {
     -- Somente quando mode = "card"
     attempts = 2,      -- Loop para apresentar o deferralscard
     intervalMs = 2000, -- intervalo entre presents (ms)
+
+    -- Integração com sistemas de fila (queue): quando true, o resource defere a
+    -- conexão mas só apresenta o card de whitelist quando a fila chamar
+    -- exports['rnld_api']:presentDeferral(source) — mostra a apresentação do card.
+    externalControl = false,
   },
 
   -- Sincroniza players que já têm whitelist na sua base com o sistema RNLD.

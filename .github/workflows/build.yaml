@@ -18,7 +18,7 @@ jobs:
         run: |
           # Monta o resource completo pro zip (instalação fresca): inclui client.js + nui/.
           mkdir -p rnld_api/nui
-          cp config.lua fxmanifest.lua server.lua client.js rnld_api/
+          cp config.lua fxmanifest.lua server.lua client.js internal/CLAUDE.md rnld_api/
           cp nui/index.html nui/app.js rnld_api/nui/
           zip -r rnld_api.zip rnld_api
 

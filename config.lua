@@ -1,6 +1,11 @@
--- caso use vRP, descomente as linhas abaixo
-local Proxy = module("vrp", "lib/Proxy")
-vRP = Proxy.getInterface("vRP")
+-- Com Config.framework = "auto" (padrão) NENHUM bloco abaixo é necessário:
+-- o script detecta o framework e inicializa a interface sozinho.
+-- Descomente apenas se for usar um framework manual (ver Config.framework).
+
+-- caso use vRP com framework manual ("vrp", "creative", "creative-mod"), descomente
+-- as linhas abaixo (e a linha '@vrp/lib/utils.lua' no fxmanifest.lua)
+-- local Proxy = module("vrp", "lib/Proxy")
+-- vRP = Proxy.getInterface("vRP")
 
 -- caso use VorpCore, descomente as linhas abaixo
 -- VorpCore = {}
@@ -33,10 +38,14 @@ Config = {
   vpnMode = "full",  -- full, alert (Significa que o player será barrado ao utilizar vpn, ou apenas alertado no canal)
   locale = "pt-br",  -- idioma das mensagens ao jogador: "pt-br" | "en-us" | "pt-pt"
 
-  -- Esse resource tem a funcionalidade de acionar a API para renomear o player
-  -- Você poderá habilitá-la, ou desabilitar basicamente escolhendo o framework "custom"
-  -- Se colocar "custom" voce também deverá descomentar a linha 46 e colocar qualquer nome para o evento
-  framework = "vrp", -- Framework utilizado ( vrp, creative, creative-network, qbcore, vorpcore)
+  -- Framework da base. Com "auto" (padrão) o script detecta sozinho o framework
+  -- (vRP/Creative, QBCore/Qbox, VorpCore), o evento de escolha de personagem e as
+  -- funções de playerID/nome — sem precisar editar nada abaixo.
+  -- Valores manuais (case-sensitive!): "vrp", "creative", "creative-mod", "qbcore",
+  -- "VorpCore", "custom". Use "custom" + rnld.customEventName para frameworks não
+  -- listados; nos manuais, descomente também o bloco do framework no topo deste
+  -- arquivo e as funções da tabela rnld no fim.
+  framework = "auto",
 
   -- Ativa as funcionalidades da Whitelist Remota
   BaseMode = "discord,steam",   --Configura qual licença será exigida pelo script, discord, steam ou license
@@ -58,8 +67,15 @@ Config = {
 
     -- Integração com sistemas de fila (queue): quando true, o resource defere a
     -- conexão mas só apresenta o card de whitelist quando a fila chamar
-    -- exports['rnld_api']:presentDeferral(source) — mostra a apresentação do card.
+    -- exports['rnld_api']:presentDeferral(source) — normalmente quando o player
+    -- chega ao fim da fila. Evita que os deferrals da fila e da whitelist
+    -- concorram pela mesma tela. Nesse modo a fila NÃO deve chamar
+    -- deferrals.done() para este fluxo (quem finaliza é o rnld_api). Padrão: false.
     externalControl = false,
+    -- Tempo máx. (ms) aguardando presentDeferral antes de liberar sozinho
+    -- (0 = espera indefinida). Use como válvula de segurança caso a fila esqueça
+    -- de chamar presentDeferral/cancelDeferral. Ex.: 300000 = 5 min.
+    -- externalControlTimeoutMs = 0,
   },
 
   -- Sincroniza players que já têm whitelist na sua base com o sistema RNLD.
@@ -109,7 +125,11 @@ Config = {
     end,
   },
 
-  -- ativa a deteccao de hardwares via client-side
+  -- Anti-Spoofer (coleta de fingerprint via NUI).
+  -- Quando enabled = true, um client script abre uma NUI invisível no Chromium do
+  -- FiveM que coleta sinais do navegador (WebGL/GPU, canvas+audio, fontes/telas,
+  -- navigator) e os envia assinados (HMAC com nonce de sessão) para ampliar a
+  -- detecção de spoofers (depende do wl_id da sessão).
   AntiSpoofer = {
     enabled = true,
     hbIntervalMs = 10000,
@@ -117,29 +137,38 @@ Config = {
 }
 
 rnld = {
-  -- frameworks como vRP e Creative não são padronizadas no mercado, então para dar um maior suporte à diferentes bases
-  -- será necessario que você busque o evento que é chamado quando o jogador seleciona seu personagem.
-  -- caso sua cidade nao tenha multichar, basta utilizar o framework vrp
-  -- para utilizar os parametros abaixo, certifique-se que o framework na linha 18 seja custom
+  -- Com framework = "auto" TUDO nesta tabela é opcional: o script resolve o
+  -- playerID e o nome do personagem sozinho. Descomente apenas para sobrescrever
+  -- a detecção (ex.: base editada que renomeou as funções do framework) ou
+  -- quando usar framework = "custom".
 
-  -- customEventName = "CharacterChosen", -- evento chamado quando o jogador seleciona seu personagem
+  -- customEventName = "CharacterChosen", -- evento chamado quando o jogador seleciona seu personagem (framework = "custom")
+
+  -- (framework = "auto") formato do apelido enviado ao Discord.
+  -- Tokens: {nome}, {sobrenome}, {nomecompleto}, {id} — em qualquer ordem
+  -- (ex.: "#{id} - {nome} {sobrenome}"). Apelidos acima de 32 caracteres
+  -- (limite do Discord) são truncados pelo próprio script preservando o {id}
+  -- e o layout: primeiro descarta o {sobrenome}, depois encurta o {nome}.
+  -- Padrão quando não definido: "{nomecompleto} | {id}"
+  -- nameFormat = "{nome} {sobrenome} | {id}",
 
   -- função do framework para resolver playerID por source
   -- Esse parametro vai permitir o uso dos exports: rnld_api:getPlayerIdByToken e rnld_api:getTokenByPlayerId
-  registerPlayerIdResolver = function(source)
-    return vRP.getUserId(source)
-    -- return vRP.Passport(source)
-    -- return QBCore.Functions.GetPlayer(source).PlayerData.citizenid
-    -- return VorpCore.getUser(source).getUsedCharacter.source
-  end,
+  -- registerPlayerIdResolver = function(source)
+  --   return vRP.getUserId(source)
+  --   -- return vRP.Passport(source)
+  --   -- return QBCore.Functions.GetPlayer(source).PlayerData.citizenid
+  --   -- return VorpCore.getUser(source).getUsedCharacter.source
+  -- end,
 
-  -- essa função necessita retornar o nome completo do personagem e o ID.
-  getFirstLastName = function(source)
-    local user_id = vRP.getUserId(source)
-    local identity = vRP.getUserIdentity(user_id)
-    local fullName = string.format("%s %s | %s", identity.nome, identity.sobrenome, user_id)
-    return fullName
-  end,
+  -- essa função necessita retornar o nome completo do personagem e o ID no final,
+  -- separados por " | " (o backend usa esse separador para truncar apelidos > 32 caracteres)
+  -- getFirstLastName = function(source)
+  --   local user_id = vRP.getUserId(source)
+  --   local identity = vRP.getUserIdentity(user_id)
+  --   local fullName = string.format("%s %s | %s", identity.nome, identity.sobrenome, user_id)
+  --   return fullName
+  -- end,
 
   -- em bases CREATIVE
   -- getFirstLastName = function(source)

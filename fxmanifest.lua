@@ -2,7 +2,7 @@ fx_version 'adamant'
 rdr3_warning 'I acknowledge that this is a prerelease build of RedM, and I am aware my resources *will* become incompatible once RedM ships.'
 games { 'rdr3', 'gta5' }
 lua54 'yes'
-version '1.0.7'
+version '1.0.8'
 
 escrow_ignore {
   'config.lua',
@@ -14,7 +14,10 @@ shared_scripts {
 }
 
 server_scripts {
-  '@vrp/lib/utils.lua', -- caso não utilize vRP, remova essa linha
+  -- Com Config.framework = "auto" (padrão) NÃO descomente nada aqui: o script
+  -- carrega a lib do vRP em runtime sozinho (inclusive o case utils/Utils).
+  -- Só é necessário para configuração MANUAL de vRP (framework = "vrp"/"creative"/...).
+  -- '@vrp/lib/utils.lua',
   -- '@vrp/lib/Utils.lua', -- Algumas Creatives usam Utils ao invés de utils
   'config.lua',
   'server.lua'

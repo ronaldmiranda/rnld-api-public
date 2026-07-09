@@ -125,6 +125,38 @@ Config = {
     end,
   },
 
+  -- Mantém a coluna do ID do Discord sempre atualizada no seu banco local.
+  -- Quando enabled = true, em TODA conexão (independente do resultado da whitelist)
+  -- o script executa um UPDATE gravando o Discord ID atual do player na coluna
+  -- especificada — útil quando o player troca de conta Discord entre sessões.
+  -- Mesmo contrato do LocalWhitelistSync: VOCÊ fornece a função `query`.
+  -- Falhas na sincronização nunca barram a entrada do player (apenas logam o erro).
+  LocalDiscordIdSync = {
+    enabled = false,
+    table = "users",              -- tabela do seu banco
+    column = "discord",           -- coluna que guarda o ID do Discord
+    identifierColumn = "license", -- coluna do WHERE usada para localizar o player
+
+    -- Opcional. Formata o valor gravado. Padrão: o ID puro (ex: "123456789012345678").
+    -- Se a sua base guarda com prefixo, descomente:
+    -- valueResolver = function(discordId, source, licenses)
+    --   return "discord:" .. discordId
+    -- end,
+
+    -- Opcional. Resolve o valor do identificador (WHERE identifierColumn = ?) a partir das licenses.
+    -- Se omitido, o script usa licenses[identifierColumn] (ex: licenses.license).
+    -- identifierResolver = function(source, licenses)
+    --   return licenses.license
+    -- end,
+
+    -- Obrigatório quando enabled = true. Recebe (sql, params) e executa na lib do seu servidor.
+    query = function(sql, params)
+      -- oxmysql:      exports.oxmysql:execute(sql, params)
+      -- mysql-async:  MySQL.Async.execute(sql, params)
+      -- ghmattimysql: exports.ghmattimysql:execute(sql, params)
+    end,
+  },
+
   -- Anti-Spoofer (coleta de fingerprint via NUI).
   -- Quando enabled = true, um client script abre uma NUI invisível no Chromium do
   -- FiveM que coleta sinais do navegador (WebGL/GPU, canvas+audio, fontes/telas,

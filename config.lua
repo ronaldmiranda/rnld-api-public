@@ -34,9 +34,8 @@ Config = {
   appKey = "",  -- Chave da API (ou use a convar rnld_api_key)
   debug = false,
   -- MockedDiscordId = "", -- junto com debug true, força o script a renomear um discord especifico, para facilitar os testes
-  monitoring = true, -- Habilita/desabilita o envio de eventos de monitoramento (session_start, session_end, server_start, server_shutdown)
-  vpnMode = "full",  -- full, alert (Significa que o player será barrado ao utilizar vpn, ou apenas alertado no canal)
-  locale = "pt-br",  -- idioma das mensagens ao jogador: "pt-br" | "en-us" | "pt-pt"
+  vpnMode = "full", -- full, alert (Significa que o player será barrado ao utilizar vpn, ou apenas alertado no canal)
+  locale = "pt-br", -- idioma das mensagens ao jogador: "pt-br" | "en-us" | "pt-pt"
 
   -- Framework da base. Com "auto" (padrão) o script detecta sozinho o framework
   -- (vRP/Creative, QBCore/Qbox, VorpCore), o evento de escolha de personagem e as

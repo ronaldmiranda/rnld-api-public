@@ -156,6 +156,30 @@ Config = {
     end,
   },
 
+  -- Sincroniza o banimento do Protect5M com o seu banco de dados local.
+  LocalBanSync = {
+    enabled = false,
+    table = "users",              -- tabela do seu banco
+    column = "banned",            -- coluna que marca o estado do banimento
+    value = true,                 -- valor aplicado na coluna quando o player está banido
+    reasonColumn = "ban_reason",  -- coluna onde o motivo do banimento é gravado
+    identifierColumn = "license", -- coluna do WHERE usada para localizar o player
+
+    -- Opcional. Resolve o valor do identificador (WHERE identifierColumn = ?) a partir das licenses.
+    -- Se omitido, o script usa licenses[identifierColumn] (ex: licenses.license).
+    -- Parâmetros: source (number), licenses (steam, discord, license, license2, fivem, live), wlId (string)
+    -- identifierResolver = function(source, licenses, wlId)
+    --   return licenses.license
+    -- end,
+
+    -- Obrigatório quando enabled = true. Recebe (sql, params) e executa na lib do seu servidor.
+    -- O `sql` já vem com placeholders (?) e `params` é a lista de valores na ordem.
+    query = function(sql, params)
+      -- oxmysql:      exports.oxmysql:execute(sql, params)
+      -- mysql-async:  MySQL.Async.execute(sql, params)
+      -- ghmattimysql: exports.ghmattimysql:execute(sql, params)
+    end,
+  },
   -- Anti-Spoofer (coleta de fingerprint via NUI).
   -- Quando enabled = true, um client script abre uma NUI invisível no Chromium do
   -- FiveM que coleta sinais do navegador (WebGL/GPU, canvas+audio, fontes/telas,

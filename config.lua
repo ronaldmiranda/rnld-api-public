@@ -52,6 +52,7 @@ Config = {
   discordInviteUrl = "",        -- Link de convite do Discord exibido no card quando o player não está na guild (ex: "https://discord.gg/seuservidor")
   whitelistUrl = "",            -- Se definida, os modos card e styled exibem um botão "liberar token (<wl_id>)" que abre <url>?token=<wl_id> no navegador em vez do campo de texto do token.
   ConsiderRockstar = true,      -- Tira a validação da license e license2 da equação
+  autoRelease = false,          -- Quando true, separa a whitelist do banimento
 
   -- Configura como a mensagem de whitelist será apresentada ao player
   ConnectUI = {

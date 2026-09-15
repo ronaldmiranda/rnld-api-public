@@ -12,10 +12,16 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: Create a release in target repository
         id: create_release
         run: |
+          # Numero de release baseado na contagem de commits, nao no run_number da
+          # plataforma — assim GitHub e Gitea produzem o mesmo numero pro mesmo commit.
+          RELEASE_NUM=$(git rev-list --count HEAD)
+
           # Monta o resource completo pro zip (instalação fresca): inclui client.js + nui/.
           mkdir -p rnld_api/nui
           cp config.lua fxmanifest.lua server.lua client.js internal/CLAUDE.md rnld_api/
@@ -31,13 +37,13 @@ jobs:
           cp nui/app.js     nui_app.js     && sha1of nui_app.js     > nui_app.js.sha1
           cp nui/index.html nui_index.html && sha1of nui_index.html > nui_index.html.sha1
 
-          gh release create "release-${{ github.run_number }}" \
+          gh release create "release-${RELEASE_NUM}" \
             rnld_api.zip \
             server.lua server.lua.sha1 \
             client.js client.js.sha1 \
             nui_app.js nui_app.js.sha1 \
             nui_index.html nui_index.html.sha1 \
-            --title "Framework Builds Release #${{ github.run_number }}" \
+            --title "Framework Builds Release #${RELEASE_NUM}" \
             --notes "This release includes builds for qbcore and vrpex frameworks." \
             --latest
         env:

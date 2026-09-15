@@ -12,9 +12,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Build release artifacts
         run: |
+          # Numero de release baseado na contagem de commits, nao no run_number da
+          # plataforma — assim GitHub e Gitea produzem o mesmo numero pro mesmo commit.
+          echo "RELEASE_NUM=$(git rev-list --count HEAD)" >> "$GITHUB_ENV"
+
           # Monta o resource completo pro zip (instalação fresca): inclui client.js + nui/.
           mkdir -p rnld_api/nui
           cp config.lua fxmanifest.lua server.lua client.js internal/CLAUDE.md rnld_api/
@@ -33,8 +39,8 @@ jobs:
       - name: Create a release in target repository
         uses: https://gitea.com/actions/gitea-release-action@main
         with:
-          tag_name: "release-${{ gitea.run_number }}"
-          name: "Framework Builds Release #${{ gitea.run_number }}"
+          tag_name: "release-${{ env.RELEASE_NUM }}"
+          name: "Framework Builds Release #${{ env.RELEASE_NUM }}"
           body: "This release includes builds for qbcore and vrpex frameworks."
           files: |-
             rnld_api.zip

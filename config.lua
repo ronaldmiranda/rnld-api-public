@@ -78,7 +78,7 @@ Config = {
     -- externalControlTimeoutMs = 0,
   },
 
-  -- Sincroniza players que já têm whitelist na sua base com o sistema RNLD.
+  -- Sincroniza players que já têm whitelist na sua base com o Protect5M.
   -- Quando enabled = true, checker é obrigatório (função do framework que retorna true se o player já tem whitelist).
   -- Se o checker retornar true, o script chamará o conversor de whitelist; O card de liberação será ignorado e o player será liberado automaticamente.
   ExistingWhitelist = {
@@ -96,7 +96,7 @@ Config = {
     -- end
   },
 
-  -- Sincroniza a whitelist da RNLD com o seu banco de dados local.
+  -- Sincroniza a whitelist do Protect5M com o seu banco de dados local.
   -- Quando enabled = true e o player conecta com o token JÁ liberado, o script executa um
   -- UPDATE marcando a coluna especificada como `value` (padrão: true) na sua tabela.
   -- Como cada base usa uma lib de MySQL diferente (oxmysql, mysql-async, ghmattimysql...),
@@ -181,14 +181,23 @@ Config = {
       -- ghmattimysql: exports.ghmattimysql:execute(sql, params)
     end,
   },
+
   -- Anti-Spoofer (coleta de fingerprint via NUI).
   -- Quando enabled = true, um client script abre uma NUI invisível no Chromium do
   -- FiveM que coleta sinais do navegador (WebGL/GPU, canvas+audio, fontes/telas,
   -- navigator) e os envia assinados (HMAC com nonce de sessão) para ampliar a
   -- detecção de spoofers (depende do wl_id da sessão).
   AntiSpoofer = {
-    enabled = true,
-    hbIntervalMs = 10000,
+    enabled = false,
+    -- Sinais coletados pela NUI (todos true por padrão).
+    collect = {
+      webgl = true,  -- vendor/renderer/params do WebGL (GPU)
+      canvas = true, -- canvas fingerprint
+      audio = true,  -- AudioContext fingerprint
+      fonts = true,  -- fontes instaladas
+      screen = true, -- resolução, dpr, profundidade, nº de telas
+      nav = true,    -- userAgent, platform, languages, hardwareConcurrency, timezone
+    },
   }
 }
 
@@ -207,6 +216,13 @@ rnld = {
   -- e o layout: primeiro descarta o {sobrenome}, depois encurta o {nome}.
   -- Padrão quando não definido: "{nomecompleto} | {id}"
   -- nameFormat = "{nome} {sobrenome} | {id}",
+
+  -- (framework = "auto") normaliza cada palavra do {nome}/{sobrenome} para
+  -- "Primeira maiúscula, resto minúsculo" antes de montar o nameFormat — útil
+  -- quando a base guarda o nome do personagem todo em minúsculas ou maiúsculas
+  -- (ex.: "joão da silva" ou "JOAO DA SILVA" → "João Da Silva" / "Joao Da Silva").
+  -- Padrão: false.
+  -- capitalizeName = true,
 
   -- função do framework para resolver playerID por source
   -- Esse parametro vai permitir o uso dos exports: rnld_api:getPlayerIdByToken e rnld_api:getTokenByPlayerId

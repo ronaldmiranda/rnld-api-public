@@ -20,7 +20,7 @@ This is the **public distribution repo** for `rnld_api`, a FiveM/RedM server res
 
 - Bundles a full fresh-install zip (`rnld_api.zip`): `config.lua`, `fxmanifest.lua`, `server.lua`, `client.js`, `internal/CLAUDE.md`, and `nui/`.
 - Also publishes individual files with `.sha1` hashes for the resource's **multi-file auto-updater** (`server.lua`, `client.js`, and the NUI files flattened to `nui_app.js` / `nui_index.html` since release assets can't contain `/`). These filenames must stay in sync with `update_artifacts` inside `server.lua` — if you ever regenerate `server.lua` with a different artifact-naming scheme, update the workflow's `cp`/`sha1of` calls to match.
-- There is no test/lint/build step for this repo — it's a packaging pipeline, not a build. Every push to `main` cuts a new dated release (`release-<run_number>`), so treat commits to `main` as release-worthy by default.
+- There is no test/lint/build step for this repo — it's a packaging pipeline, not a build. Every push to `main` cuts a new release (`release-<N>`, where `N` = `git rev-list --count HEAD` so GitHub and Gitea produce the same number), so treat commits to `main` as release-worthy by default.
 
 ## Working in this repo
 

@@ -18,7 +18,7 @@ Guia de instalação/integração deste resource em bases (frameworks) de client
 
 1. Renomear a pasta do resource para `rnld_api` (se vier zipada com outro nome).
 2. Em `config.lua`, preencher `Config.guildId` e `Config.appKey` (ou usar a convar `rnld_api_key`).
-3. **Deixar `Config.framework = "auto"` (padrão)** — o script detecta sozinho o framework (vRP/Creative, QBCore/Qbox, VorpCore) via `GetResourceState`, carrega a lib do vRP em runtime (sem tocar no `fxmanifest.lua`, inclusive resolvendo o case `utils.lua`/`Utils.lua`), descobre por tentativa as funções de playerID (Passport → getUserId) e de nome (FullName → getUserIdentity → userIdentity → Identity — os nomes variam por fork, inclusive entre bases Creative) e registra os eventos de personagem conhecidos (`CharacterChosen` **e** `ChosenCharacter`, com dedupe). O formato do apelido no modo auto é customizável via `rnld.nameFormat` no `config.lua` (tokens `{nome}`, `{sobrenome}`, `{nomecompleto}`, `{id}` em qualquer ordem, ex.: `"#{id} - {nome}"`; padrão `"{nomecompleto} | {id}"`). O truncamento para o limite de 32 caracteres do Discord é feito no próprio script (descarta sobrenome → encurta nome, preservando o `{id}` e o layout), então o truncamento por separador do backend — que exige o id no final e só vale para o `getFirstLastName` manual — nunca chega a rodar no modo auto. Só configure manualmente (passos 3m-5m abaixo) se a base for um framework não listado ou uma base editada que renomeou as funções do core.
+3. **Deixar `Config.framework = "auto"` (padrão)** — o script detecta sozinho o framework (vRP/Creative, QBCore/Qbox, VorpCore) via `GetResourceState`, carrega a lib do vRP em runtime (sem tocar no `fxmanifest.lua`, inclusive resolvendo o case `utils.lua`/`Utils.lua`), descobre por tentativa as funções de playerID (Passport → getUserId) e de nome (FullName → getUserIdentity → userIdentity → Identity — os nomes variam por fork, inclusive entre bases Creative) e registra os eventos de personagem conhecidos (`CharacterChosen` **e** `ChosenCharacter`, com dedupe). O formato do apelido no modo auto é customizável via `rnld.nameFormat` no `config.lua` (tokens `{nome}`, `{sobrenome}`, `{nomecompleto}`, `{id}` em qualquer ordem, ex.: `"#{id} - {nome}"`; padrão `"{nomecompleto} | {id}"`). Com `rnld.capitalizeName = true` cada palavra do nome/sobrenome vindo do framework é normalizada para "Primeira maiúscula, resto minúsculo" (acentos tratados) antes do template rodar — vale só nos resolvers automáticos. O truncamento para o limite de 32 caracteres do Discord é feito no próprio script (descarta sobrenome → encurta nome, preservando o `{id}` e o layout), então o truncamento por separador do backend — que exige o id no final e só vale para o `getFirstLastName` manual — nunca chega a rodar no modo auto. Só configure manualmente (passos 3m-5m abaixo) se a base for um framework não listado ou uma base editada que renomeou as funções do core.
 4. Passos manuais — **apenas quando `"auto"` não cobrir a base**:
    - 3m. Escolher o framework em `Config.framework` — **o valor precisa bater exatamente** com uma das chaves da seção "Frameworks suportados" (case-sensitive!).
    - 4m. Descomentar, em `config.lua` (topo do arquivo) e em `rnld.getFirstLastName` / `rnld.registerPlayerIdResolver` (fim do arquivo), o bloco correspondente ao framework do cliente. Essas funções, quando descomentadas, **sempre têm prioridade** sobre a auto-detecção — servem também como override pontual mantendo `framework = "auto"`.
@@ -53,13 +53,13 @@ vRP = Proxy.getInterface("vRP")
 
 - Usa o evento nativo `playerConnecting` diretamente — não precisa de handler extra.
 - `registerPlayerIdResolver` e `getFirstLastName` já vêm configurados para vRP clássico (`vRP.getUserId`, `vRP.getUserIdentity`) por padrão em `config.lua`.
-- Se for **Creative** (não vRPEX clássico), trocar para as versões comentadas que usam `vRP.Passport` / `vRP.FullName` (ver comentários em `config.lua:150,164-168`).
+- Se for **Creative** (não vRPEX clássico), trocar para as versões comentadas que usam `vRP.Passport` / `vRP.FullName` (ver os blocos comentados de `rnld.getFirstLastName` em `config.lua:~246-266`).
 
 ### Creative Network (`framework = "creative"` ou `"creative-mod"`)
 
 - Mesma inicialização de Proxy do vRP (Creative usa a mesma lib `vrp/lib/Proxy`).
 - `registerPlayerIdResolver`: `return vRP.Passport(source)`.
-- `getFirstLastName`: usar o bloco comentado em `config.lua:164-168` (`vRP.FullName`).
+- `getFirstLastName`: usar o bloco comentado em `config.lua:~246-250` (`vRP.FullName`).
 - Se a base dispara `CharacterChosen`, use `"creative"`; se a variante renomeou o evento para `ChosenCharacter`, use `"creative-mod"`. Confirme com o cliente/dono da base qual evento ela realmente dispara (`grep -r "ChosenCharacter\|CharacterChosen"` nos resources da base).
 
 ### QBCore (`framework = "qbcore"`)
@@ -70,7 +70,7 @@ local QBCore = exports['qb-core']:GetCoreObject()
 ```
 
 - `registerPlayerIdResolver`: `return QBCore.Functions.GetPlayer(source).PlayerData.citizenid`.
-- `getFirstLastName`: usar o bloco comentado em `config.lua:172-176` (`PlayerData.charinfo`).
+- `getFirstLastName`: usar o bloco comentado em `config.lua:~254-258` (`PlayerData.charinfo`).
 - Handler já espera `Player.PlayerData.source` — nenhum ajuste extra necessário além do Proxy acima.
 - Adicionar `'@ox_lib/init.lua'` em `shared_scripts` no `fxmanifest.lua` se a base depender de `ox_lib` (comum em QBCore moderno).
 
@@ -85,7 +85,7 @@ end)
 ```
 
 - `registerPlayerIdResolver`: `return VorpCore.getUser(source).getUsedCharacter.source`.
-- `getFirstLastName`: usar o bloco comentado em `config.lua:179-184`.
+- `getFirstLastName`: usar o bloco comentado em `config.lua:~261-266`.
 - **Case sensível**: escreva `Config.framework = "VorpCore"` — `"vorpcore"` em minúsculo não bate com a chave da tabela e o handler nunca é registrado.
 - `fxmanifest.lua` já declara `games { 'rdr3', 'gta5' }`, então RedM funciona sem alteração no manifest.
 
@@ -105,7 +105,7 @@ rnld.customEventName = "SeuEventoDeCharacterSelect" -- evento disparado quando o
 - **ID do personagem**: procure por termos como `GetPlayer`, `PlayerData`, `Character`, `Identity`, `citizenid`, `getUser`, `Passport` dentro dos resources do "core" da base (`grep -rEn "citizenid|PlayerData|getUsedCharacter|Passport|GetCharacter" <core do framework>/*.lua`). É o valor que os outros frameworks já usam (`vRP.getUserId`, `vRP.Passport`, `PlayerData.citizenid`, `getUsedCharacter.source`) — o equivalente de "chave primária do personagem", não da conexão (`source`).
 - **Nome completo**: procure a tabela/objeto de identidade do personagem (normalmente tem `firstname`/`lastname`, `nome`/`sobrenome`, ou `charinfo`) e monte a string como os outros blocos já fazem: `string.format("%s %s | %s", nome, sobrenome, id)`.
   - **Importante**: o backend (`memberService.atualizarApelidoMembro`, no `rnld-api` Node) trunca apelidos com mais de 32 caracteres procurando um separador `#`, `|` ou `-` na string e mantendo só o primeiro nome + separador + id. Ou seja, `getFirstLastName` **precisa** devolver o ID no final, separado por um desses três caracteres (`|` é o padrão usado pelos outros frameworks), senão o truncamento quebra em nomes longos.
-- Copie um dos blocos já comentados em `config.lua` (linhas 148-184) como esqueleto e apenas troque as chamadas do framework — a estrutura da função (parâmetro `source`, retorno de string/valor) já está certa.
+- Copie um dos blocos já comentados em `config.lua` (tabela `rnld`, a partir da linha ~204) como esqueleto e apenas troque as chamadas do framework — a estrutura da função (parâmetro `source`, retorno de string/valor) já está certa.
 
 #### 2. Preste atenção à ordem dos parâmetros do evento
 
@@ -139,12 +139,51 @@ end)
 
 - Se a base não tem multichar, pode-se usar `framework = "vrp"` mesmo sem vRP real, desde que `playerConnecting` seja o gatilho correto — mas prefira `custom` para não confundir o Proxy do vRP com um framework que não o usa.
 
+## Desativando a validação de whitelist nativa da base (`playerConnecting` e similares)
+
+O `rnld_api` passa a ser a **única** autoridade de whitelist/ban. Se a base do cliente continua validando WL por conta própria, o player é liberado pelo `rnld_api` e barrado de novo pela base (ou o contrário) — dois `deferrals` brigando pela mesma tela. Essa remoção é feita **na base do cliente, nunca no `rnld_api`** (`server.lua` é sobrescrito pelo auto-updater). Faça isto antes de entregar:
+
+1. **Ache os pontos de validação** nos resources da base (não no `rnld_api`):
+   ```
+   grep -rEn "playerConnecting" resources/ --include=*.lua
+   grep -rEniE "whitelist|isWhitelisted|getWhitelisted|\.whitelist|setWhitelist|wl_?id" resources/ --include=*.lua
+   ```
+   Lugares típicos: `vrp/base.lua` (vRP/Creative: `vRP:playerConnecting` / `isWhitelisted` / `rows.whitelist`), `vrp_queue`/`queue`/`connectqueue` (filas), resources `*whitelist*`, `qb-core/server/events.lua` (`QBCore.Functions.IsWhitelisted`, `Config.Server.Whitelist`), `vorp_core` (`Config.Whitelist`/`vorp_whitelist`).
+2. **Prefira desligar por configuração** a apagar código: `Config.Whitelist = false` / `Config.Server.Whitelist = false` / `Whitelist = false`, ou dar `stop`/remover o `ensure` de um resource dedicado de WL. Só edite código quando não existir flag.
+3. **Se o check é um `if` dentro de um handler `playerConnecting`**, neutralize só o bloco (comente ou faça sempre passar) e **mantenha o resto do handler** (identificadores, criação de usuário, `deferrals.done()` final). Nunca remova o handler inteiro: ele costuma criar o registro do player e liberar o deferral.
+   ```lua
+   -- antes
+   if not isWhitelisted(user_id) then
+     deferrals.done("Você não tem whitelist.")
+     return
+   end
+   -- depois: a decisão é do rnld_api
+   -- (bloco removido/comentado)
+   ```
+4. **Preserve o dado local de WL** se outras partes da base o leem (ex.: coluna `whitelisted` usada por scripts de RH/staff). Em vez de apagar, deixe o `rnld_api` manter a coluna em dia com `Config.LocalWhitelistSync` (e, para bans, `Config.LocalBanSync`).
+5. **Migração de quem já tem WL na base**: habilite `Config.ExistingWhitelist` com um `checker` que consulta a coluna/tabela atual — assim quem já está liberado entra automaticamente e o card é ignorado. Faça isso **antes** de remover o check nativo, senão jogadores antigos caem no card de liberação.
+6. **Filas (queue)**: se a fila registra seu próprio `playerConnecting` com `deferrals`, ligue `Config.ConnectUI.externalControl = true` e faça a fila chamar `exports['rnld_api']:presentDeferral(source)` ao liberar o player (`cancelDeferral(source)` se ele sair da fila). Não deixe a fila chamar `deferrals.done()` para esse fluxo. Defina `externalControlTimeoutMs` como válvula de segurança.
+7. **Ordem de boot**: `ensure rnld_api` depois do core da base (e da fila, se houver) no `server.cfg`.
+8. **Validar**: com `Config.debug = true`, conecte com (a) player sem WL — deve cair no card/mensagem do `rnld_api` e **nenhuma** mensagem da base; (b) player liberado — entra direto; (c) player banido — recebe `bannedMsg`. Se aparecer mensagem de WL que não é do `rnld_api`, ainda sobrou um check; repita o grep do passo 1 (inclusive em resources de fila, loading screen e `server.cfg` com `sv_*whitelist*`).
+
+⚠️ Antes de editar qualquer arquivo da base do cliente, **mostre ao usuário o diff proposto e peça confirmação** — são arquivos dele, e removido o check nativo sem o `rnld_api` configurado (`appKey`/`guildId`) o servidor fica **sem nenhuma whitelist**.
+
 ## Integrações opcionais (perguntar ao cliente antes de habilitar)
 
+- **`Config.LocalDiscordIdSync`** — mantém a coluna do Discord ID da tabela local do cliente sempre atualizada (o player pode trocar de conta Discord entre sessões). Roda em **toda** conexão, independente do resultado da whitelist, antes dos gates de fila/basemode. Mesmo contrato do `LocalWhitelistSync` (`query(sql, params)` obrigatória); `valueResolver` opcional adequa o formato gravado (padrão é o ID puro; bases vRP costumam guardar `"discord:" .. id`). Falha na sync nunca bloqueia o player (só loga), e UPDATE em linha inexistente (primeira conexão) é no-op — sincroniza na próxima.
 - **`Config.LocalWhitelistSync`** — grava a liberação também na tabela local do cliente. `enabled = true` exige a função `query(sql, params)` escrita para a lib de MySQL da base (`oxmysql`, `mysql-async`, `ghmattimysql`...). Falha na sync nunca bloqueia o player (só loga).
 - **`Config.ExistingWhitelist`** — auto-libera quem já tem WL na base do cliente. `enabled = true` exige a função `checker(source, licenses)` (deve consultar o banco/sistema de WL já existente da base e retornar `true`/`false`).
 - **`Config.ConnectUI.externalControl`** — para bases com sistema de fila (queue) próprio. Quando `true`, a fila deve chamar `exports['rnld_api']:presentDeferral(source)` no momento de liberar o player (nunca `deferrals.done()` direto), e pode chamar `exports['rnld_api']:cancelDeferral(source)` se remover o player da fila antes disso.
+- **`Config.LocalBanSync`** — grava o banimento da API na tabela local do cliente (`table`, `column` + `value`, `reasonColumn`, `identifierColumn`). Mesmo contrato do `LocalWhitelistSync` (`query(sql, params)` obrigatória, `identifierResolver` opcional); sem `query`/colunas o script loga e ignora. Combina com `Config.autoRelease` (abaixo), que separa WL de banimento.
 - **`Config.AntiSpoofer`** — independe de framework; liga/desliga coleta de fingerprint via NUI. Não precisa de nenhuma integração além de `enabled = true`.
+
+## Outras opções do `Config` relevantes no onboarding
+
+- **`Config.BaseMode`** (`"discord,steam"` por padrão) — identificadores exigidos, separados por vírgula (`discord`, `steam`, `license`); **todos** são obrigatórios (AND). Jogador sem algum deles é barrado com `basemode_not_found`. A lista também é enviada à API no header `X-RNLD-Selected-Basemodes`. Se o cliente não usa Steam, tire `steam` daqui.
+- **`Config.autoRelease`** (`false`) — quando `true`, separa a whitelist do banimento (enviado à API em `X-RNLD-Auto-Release`).
+- **`Config.ConnectUI.watchRelease`** (padrão `true`, só `mode = "card"`) — enquanto o card está aberto o script consulta a API (`watchIntervalMs`, mín. 2000, padrão 5000) e finaliza o deferral sozinho quando o player é liberado (bot/ticket/site). `watchTimeoutMs` padrão 15 min (0 = indefinido). Em `styled`/`text` não se aplica. Observação: essas chaves hoje só existem em `server.lua`; o `config.lua` público não as documenta.
+- Outras: `vpnMode` (`full`/`alert`), `locale` (`pt-br`/`en-us`/`pt-pt`), `validarPresencaGuild`, `discordInviteUrl`, `whitelistUrl`, `ConsiderRockstar`, `MockedDiscordId` (só com `debug`).
+- **Exports do resource** (úteis para integrar outros scripts do cliente): `getTokenBySource`, `getSourceByToken`, `getPlayerIdByToken`, `getTokenByPlayerId`, `updateTokenCache`/`clearTokenCache`, `updatePlayerIdTokenCache`/`clearPlayerIdTokenCache`, `presentDeferral`/`cancelDeferral`, `getWlId`, `toggleBan`, `toggleWhitelist`, `toggleStaff`, `toggleGroups`, `changeNickname`, `getDiscordTags`, `queryPlayer`, `verificarMembro`, `rnldRequest`.
 
 ## Erros comuns de instalação
 
